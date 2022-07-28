@@ -9,7 +9,6 @@ RUN autoreconf -if
 RUN ./configure --prefix=/install
 RUN make -j8
 RUN make install
-ENV LD_LIBRARY_PATH=/repo/.libs
 
 FROM ubuntu:22.04 as package
 RUN apt-get update
