@@ -2,4 +2,4 @@ project: aircrack-ng
 target: airodump-ng
 
 cmds:
-  - cmd: /repo/.libs/airodump-ng -r @@
+  - cmd: /install/sbin/airodump-ng -r @@
