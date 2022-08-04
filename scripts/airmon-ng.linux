@@ -249,7 +249,7 @@ findFreeInterface() {
 						printf "Unable to create wlan%s%s and no error received.\n" "${i}" "${target_suffix}"
 						return 1
 					fi
-					printf "\n\t\t(mac80211 %s mode vif enabled on [%s]wlan%s%s\n" "${target_mode}" "${PHYDEV}" "${i}" "${target_suffix}"
+                    printf "\n\t\t(mac80211 %s mode vif enabled on [%s]wlan%s%s)\n" "${target_mode}" "${PHYDEV}" "${i}" "${target_suffix}"
 					unset IW_ERROR
 					break
 				else
@@ -1163,7 +1163,7 @@ scanProcesses() {
 		pso="1"
 	fi
 
-	PROCESSES="wpa_action\|wpa_supplicant\|wpa_cli\|dhclient\|ifplugd\|dhcdbd\|dhcpcd\|udhcpc\|NetworkManager\|knetworkmanager\|avahi-autoipd\|avahi-daemon\|wlassistant\|wifibox\|net_applet\|wicd-daemon\|wicd-client\|iwd"
+	PROCESSES="wpa_action\|wpa_supplicant\|wpa_cli\|dhclient\|ifplugd\|dhcdbd\|dhcpcd\|udhcpc\|NetworkManager\|knetworkmanager\|avahi-autoipd\|avahi-daemon\|wlassistant\|wifibox\|net_applet\|wicd-daemon\|wicd-client\|iwd\|hostapd"
 	#PS_ERROR="invalid\|illegal"
 
 	if [ "${1}" = "kill" ]; then
@@ -1258,18 +1258,16 @@ listInterfaces() {
     if [ -f "/sys/class/net/${iface}/uevent" ]; then
       if grep -q 'DEVTYPE=wlan' "/sys/class/net/${iface}/uevent"
       then
-        iface_list="${iface_list}\n ${iface}"
+        iface_list="${iface_list} ${iface}"
       fi
     fi
   done
   if [ -x "$(command -v iwconfig 2>&1)" ] && [ -x "$(command -v sort 2>&1)" ]; then
     for iface in $(iwconfig 2> /dev/null | sed -e 's/^\(\w*\)\s.*/\1/' -e '/^$/d'); do
-      iface_list="${iface_list}\n ${iface}"
+      iface_list="${iface_list} ${iface}"
     done
-    # This breaks if you fix SC2059 and I am not sure why
-    # This should probably be space separated instead of newline
-    # shellcheck disable=SC2059
-    iface_list="$(printf "${iface_list}" | sort -bu)"
+    #                                           sort needs newline separated,   convert back after
+    iface_list="$(printf "%s" "${iface_list}" | sed 's/ /\n/g' | sort -bu | sed ':a;N;$!ba;s/\n/ /g')"
   fi
 }
 
